@@ -11,7 +11,7 @@ class GPS:
         return lat, lat_dir, lon, lon_dir, altitude, altitude_units
 
     @staticmethod
-    def _parse_sentence(NMEA_sentence):
+    def _parse_sentence(NMEA_sentence): 
         if NMEA_sentence.find("GGA") > 0:
             msg = pynmea2.parse(NMEA_sentence)
             return msg.lat, msg.lat_dir, msg.lon, msg.lon_dir, msg.altitude, msg.altitude_units
