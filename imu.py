@@ -4,7 +4,7 @@ import adafruit_bno055
 import time
 import math
 
-MAX_JERK = 15000  # 15000 Gs per second
+MAX_JERK = 15#10000  # 10000 Gs per second
 IMPACT_ACCEL_THRESH = 10  # 10 Gs
 STILL_ACCEL_THRESH = 0.2
 STILL_LENGTH_THRESH = 10
@@ -33,9 +33,13 @@ last_accel = 0
 
 
 while True:
-    accel_mag = math.sqrt(sum((0 if axis is None else axis)**2 for axis in sensor.linear_acceleration)) * 0.101971621
+    try:
+        accel_mag = math.sqrt(sum((0 if axis is None else axis)**2 for axis in sensor.linear_acceleration)) * 0.101971621
+    except OSError:
+        accel_mag = last_accel
+        continue
     now_time = time.perf_counter()
-    jerk_mag = (accel_mag - last_accel) / (now_time - last_time)
+    jerk_mag = (accel_mag - last_accel) #/ (now_time - last_time)
 
     # this is to filter out random spikes of the accelerometer
     if jerk_mag > MAX_JERK:
