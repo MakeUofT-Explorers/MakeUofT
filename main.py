@@ -25,18 +25,15 @@ state = 'normal'  # 'normal', 'warning', 'crashed'
 warning_start_time = 0
 last_honk = 0
 
-
 def send_position():
     lat, lat_dir, lon, lon_dir, altitude, altitude_units = gps.position()
 
     message = 'I have crashed and need help. time: ' + time.strftime("%H:%M:%S", time.localtime()) + 'lat: ' + str(lat) + ' lon: ' + str(lon) + 'alt: ' + str(altitude)
 
-    text_interface.send(message)
-
+    text_interface.send(message) 
 
 def button_pressed():
     return GPIO.input(BUTTON_PIN) == GPIO.HIGH
-
 
 if __name__ == '__main__':
     while True:
