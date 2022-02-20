@@ -4,6 +4,11 @@ import adafruit_bno055
 import time
 import math
 
+MAX_JERK = 15000  # 15000 Gs per second
+IMPACT_ACCEL_THRESH = 10  # 10 Gs
+STILL_ACCEL_THRESH = 0.2
+STILL_LENGTH_THRESH = 10
+
 i2c = busio.I2C(board.SCL, board.SDA)
 sensor = adafruit_bno055.BNO055_I2C(i2c)
 
@@ -15,24 +20,44 @@ sensor.mode = adafruit_bno055.NDOF_MODE
 time.sleep(0.01)
 
 
-l_time = start_time = time.perf_counter()
-l_accel = 0
+last_time = start_time = time.perf_counter()
+still_time_start = start_time
 
-max_accel, max_jerk = 0, 0
+impact_time = None
+still_length = 0
+still = False
 
-f = open("fall2.csv", "a")
+last_accel = 0
+
+#f = open("fall2.csv", "a")
 
 
-while (time.perf_counter() - start_time) < 4:
+while True:
     accel_mag = math.sqrt(sum((0 if axis is None else axis)**2 for axis in sensor.linear_acceleration)) * 0.101971621
-    n_time = time.perf_counter()
-    jerk_mag = (accel_mag - l_accel) / (n_time - l_time)
-    l_accel = accel_mag
-    l_time = n_time
-    max_accel = max(accel_mag, max_accel)
-    max_jerk = max(jerk_mag, max_jerk)
-    f.write(str(n_time) + "," + str(accel_mag) + "," + str(jerk_mag) + "\n")
-    print(f"accel_mag: {accel_mag:10.4}, jerk: {jerk_mag:20.10}", end='\r')
-    #print(f"max_accel: {max_accel:10.4}, max_jerk: {max_jerk:10.4}", end='\r')
+    now_time = time.perf_counter()
+    jerk_mag = (accel_mag - last_accel) / (now_time - last_time)
 
-f.close()
+    # this is to filter out random spikes of the accelerometer
+    if jerk_mag > MAX_JERK:
+        accel_mag = last_accel
+
+    last_accel = accel_mag
+    last_time = now_time
+
+    if accel_mag > IMPACT_ACCEL_THRESH:
+        impact_time = now_time
+
+    if accel_mag < STILL_ACCEL_THRESH:
+        still_length = now_time - still_time_start
+        if still_length > STILL_LENGTH_THRESH:
+            still = True
+        else:
+            still_length = 0
+    else:
+        still = False
+        still_time_start = now_time
+
+    #f.write(str(now_time) + "," + str(accel_mag) + "," + str(jerk_mag) + "\n")
+    print("impact_time: {}, still: {} {}, accel: {}, jerk: {}".format(impact_time, still, still_length, accel_mag, jerk_mag))
+
+#f.close()
