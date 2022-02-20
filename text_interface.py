@@ -4,7 +4,7 @@ import re
 
 class GSM:
     """Send and recieve SMS messages over serial using AT commands"""
-    def __init__(self, number=911, port="/dev/ttyS0", baudrate=9600, timeout=1):
+    def __init__(self, number=0, port="/dev/ttyS0", baudrate=9600, timeout=1):
         self.number = number
         self.port = serial.Serial(port, baudrate, timeout, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)
 
@@ -50,6 +50,3 @@ class GSM:
                 break
 
         return response[:-5]
-
-
-
