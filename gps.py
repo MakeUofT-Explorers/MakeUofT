@@ -12,7 +12,7 @@ class GPS:
         except AttributeError:
             self.testing_indoors = True
 
-    def position(self):
+    def get_position(self):
         if self.testing_indoors:
             return 10, 20, 30, 40, 50, 60
 

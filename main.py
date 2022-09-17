@@ -26,7 +26,7 @@ warning_start_time = 0
 last_honk = 0
 
 def send_position():
-    lat, lat_dir, lon, lon_dir, altitude, altitude_units = gps.position()
+    lat, lat_dir, lon, lon_dir, altitude, altitude_units = gps.get_position()
 
     message = 'I have crashed and need help. time: ' + time.strftime("%H:%M:%S", time.localtime()) + 'lat: ' + str(lat) + ' lon: ' + str(lon) + 'alt: ' + str(altitude)
 
@@ -39,7 +39,7 @@ if __name__ == '__main__':
     while True:
         # debugging:
         print("imu: ", imu.is_still(), imu.get_time_since_last_impact())
-        print("gps: ", gps.position)
+        print("gps: ", gps.get_position)
 
         # cancel the warning procedure by pressing the button
         if button_pressed():
